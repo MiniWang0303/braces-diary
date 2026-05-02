@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>牙套日記 🦷</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --mint: #3ecfb2;
+  --mint-light: #d0f5ee;
+  --mint-dark: #28a88e;
+  --coral: #ff6b6b;
+  --coral-light: #ffe0e0;
+  --yellow: #ffc947;
+  --yellow-light: #fff4d6;
+  --blue: #4a90d9;
+  --blue-light: #dceeff;
+  --purple: #9b8df8;
+  --purple-light: #ede9ff;
+  --sky: #38bdf8;
+  --sky-light: #e0f5ff;
+  --sky-dark: #0284c7;
+  --lavender: #a78bfa;
+  --lavender-light: #ede9fe;
+  --lavender-dark: #7c3aed;
+  --bg: #f0faf7;
+  --card: #ffffff;
+  --text: #1a2e2a;
+  --text-soft: #6b8a83;
+  --border: #c8ede6;
+  --shadow: 0 4px 20px rgba(62,207,178,0.12);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 50px; }
+
+/* HEADER */
+.header {
+background: linear-gradient(135deg, #2ab5a0 0%, #3ecfb2 60%, #52d9c4 100%);
+padding: 20px 16px 16px;
+position: relative; overflow: hidden;
+}
+.header::before { content:''; position:absolute; top:-40px; right:-20px; width:130px; height:130px; background:rgba(255,255,255,0.1); border-radius:50%; }
+.header::after { content:''; position:absolute; bottom:-25px; left:20px; width:90px; height:90px; background:rgba(255,255,255,0.07); border-radius:50%; }
+.header-top { display:flex; justify-content:space-between; align-items:flex-start; position:relative; }
+.header h1 { font-family:'Nunito',sans-serif; font-size:21px; font-weight:900; color:white; }
+.header h1 small { font-size:13px; font-weight:600; opacity:0.85; display:block; margin-top:2px; }
+.today-badge { background:rgba(255,255,255,0.22); border-radius:12px; padding:5px 10px; font-size:12px; font-weight:700; color:white; text-align:right; }
+.tray-row { display:flex; gap:8px; margin-top:12px; position:relative; flex-wrap:wrap; }
+.tray-chip { background:rgba(255,255,255,0.22); border-radius:20px; padding:6px 12px; font-size:13px; color:white; font-weight:700; display:flex; align-items:center; gap:5px; }
+.tray-chip.alert { background:rgba(255,200,80,0.35); }
+
+/* TABS */
+.tabs { display:flex; background:white; border-bottom:2px solid var(--border); position:sticky; top:0; z-index:100; box-shadow:0 2px 8px rgba(0,0,0,0.07); }
+.tab { flex:1; padding:12px 4px 10px; text-align:center; font-size:12px; font-weight:700; color:var(--text-soft); cursor:pointer; border-bottom:3px solid transparent; transition:all 0.2s; }
+.tab.active { color:var(--mint-dark); border-bottom-color:var(--mint); }
+.tab .tab-icon { font-size:18px; display:block; margin-bottom:2px; }
+
+/* PAGE */
+.page { display:none; padding:14px 14px 0; }
+.page.active { display:block; }
+
+/* CARD */
+.card { background:white; border-radius:20px; padding:16px; margin-bottom:12px; box-shadow:var(--shadow); border:1.5px solid var(--border); }
+.card-title { font-size:12px; font-weight:800; color:var(--text-soft); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:14px; display:flex; align-items:center; gap:6px; }
+
+/* HOURS SLIDER */
+.hours-big { text-align:center; padding:6px 0 4px; }
+.hours-num { font-family:'Nunito',sans-serif; font-size:64px; font-weight:900; color:var(--mint-dark); line-height:1; }
+.hours-unit { font-size:15px; color:var(--text-soft); font-weight:700; margin-top:2px; }
+.hours-controls { display:flex; align-items:center; justify-content:center; gap:10px; margin-top:10px; }
+.h-btn { width:46px; height:46px; border-radius:50%; border:none; font-size:22px; font-weight:900; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.15s; }
+.h-btn.minus { background:var(--coral-light); color:var(--coral); }
+.h-btn.plus { background:var(--mint-light); color:var(--mint-dark); }
+.h-btn:active { transform:scale(0.88); }
+.h-btn.half { font-size:14px; font-weight:800; }
+.hours-bar-wrap { margin-top:12px; }
+.hours-bar { height:10px; background:var(--mint-light); border-radius:10px; overflow:hidden; }
+.hours-bar-fill { height:100%; background:linear-gradient(90deg, var(--mint), var(--mint-dark)); border-radius:10px; transition:width 0.35s ease; }
+.hours-status { font-size:12px; color:var(--text-soft); font-weight:600; margin-top:6px; text-align:center; }
+.hours-presets { display:flex; gap:6px; justify-content:center; flex-wrap:wrap; margin-top:10px; }
+.preset-btn { background:var(--bg); border:1.5px solid var(--border); border-radius:10px; padding:5px 11px; font-size:12px; font-weight:700; color:var(--text-soft); cursor:pointer; transition:all 0.15s; }
+.preset-btn:active, .preset-btn.active { background:var(--mint-light); border-color:var(--mint); color:var(--mint-dark); }
+
+/* BRUSHING SESSIONS */
+.session-block { border:1.5px solid var(--border); border-radius:16px; margin-bottom:10px; overflow:hidden; }
+.session-header { display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:#fafffe; cursor:pointer; }
+.session-label { font-size:15px; font-weight:800; display:flex; align-items:center; gap:8px; }
+.session-summary { font-size:12px; color:var(--text-soft); font-weight:600; }
+.session-body { padding:10px 14px 14px; display:none; }
+.session-body.open { display:block; }
+.care-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px; }
+.care-btn { border:2px solid var(--border); border-radius:12px; padding:10px 8px; text-align:center; cursor:pointer; transition:all 0.2s; background:white; }
+.care-btn.checked { border-color:var(--mint); background:var(--mint-light); }
+.care-btn.checked .care-icon { filter:none; }
+.care-btn .care-icon { font-size:20px; display:block; margin-bottom:4px; }
+.care-btn .care-label { font-size:12px; font-weight:700; color:var(--text); }
+.care-btn.none-btn { border-color:var(--coral-light); }
+.care-btn.none-btn.checked { border-color:var(--coral); background:var(--coral-light); }
+.care-btn.skip-btn { border-color:#e0e0e0; }
+.care-btn.skip-btn.checked { border-color:#aaa; background:#f0f0f0; color:#888; }
+.session-chevron { font-size:12px; color:var(--text-soft); transition:transform 0.2s; }
+.session-chevron.open { transform:rotate(180deg); }
+.add-snack-btn { width:100%; padding:11px; background:var(--bg); border:2px dashed var(--border); border-radius:14px; font-size:13px; font-weight:700; color:var(--text-soft); cursor:pointer; margin-bottom:12px; transition:all 0.15s; }
+.add-snack-btn:active { background:var(--mint-light); border-color:var(--mint); color:var(--mint-dark); }
+
+/* TRAY SECTION */
+.tray-display { display:flex; align-items:center; justify-content:space-between; padding:6px 0; }
+.tray-expected { font-size:13px; color:var(--text-soft); font-weight:600; }
+.tray-actual-row { display:flex; align-items:center; gap:10px; margin-top:10px; }
+.tray-num-display { font-family:'Nunito',sans-serif; font-size:42px; font-weight:900; color:var(--mint-dark); min-width:60px; text-align:center; }
+.tray-adj-btn { width:38px; height:38px; border-radius:50%; border:none; font-size:20px; font-weight:900; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.tray-adj-btn.minus { background:var(--coral-light); color:var(--coral); }
+.tray-adj-btn.plus { background:var(--mint-light); color:var(--mint-dark); }
+.tray-adj-btn:active { transform:scale(0.88); }
+.tray-match { font-size:12px; margin-top:4px; text-align:center; font-weight:700; }
+.tray-match.ok { color:var(--mint-dark); }
+.tray-match.diff { color:var(--coral); }
+
+/* NOTE */
+.note-input { width:100%; padding:10px 12px; border:2px solid var(--border); border-radius:12px; font-size:14px; font-family:'Noto Sans TC',sans-serif; color:var(--text); resize:none; height:64px; }
+.note-input:focus { outline:none; border-color:var(--mint); }
+
+/* SUBMIT */
+.submit-btn { width:100%; padding:16px; background:linear-gradient(135deg, var(--mint) 0%, var(--mint-dark) 100%); color:white; border:none; border-radius:16px; font-size:17px; font-weight:800; font-family:'Noto Sans TC',sans-serif; cursor:pointer; margin-top:4px; box-shadow:0 6px 20px rgba(62,207,178,0.35); transition:all 0.2s; }
+.submit-btn:active { transform:scale(0.97); }
+.submit-btn:disabled { opacity:0.6; cursor:not-allowed; }
+.status-msg { text-align:center; padding:10px; border-radius:12px; font-size:14px; font-weight:600; margin-top:10px; display:none; }
+.status-msg.success { background:var(--mint-light); color:var(--mint-dark); display:block; }
+.status-msg.error { background:var(--coral-light); color:var(--coral); display:block; }
+
+/* STATS */
+.countdown-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
+.countdown-card { border-radius:18px; padding:14px 12px; text-align:center; }
+.countdown-card.tray { background:var(--mint-light); border:1.5px solid var(--mint); }
+.countdown-card.appt { background:var(--yellow-light); border:1.5px solid var(--yellow); }
+.countdown-days { font-family:'Nunito',sans-serif; font-size:36px; font-weight:900; line-height:1; }
+.countdown-card.tray .countdown-days { color:var(--mint-dark); }
+.countdown-card.appt .countdown-days { color:#b07a00; }
+.countdown-unit { font-size:12px; font-weight:700; color:var(--text-soft); }
+.countdown-label { font-size:11px; color:var(--text-soft); margin-top:5px; font-weight:600; }
+.countdown-date { font-size:11px; color:var(--text-soft); font-weight:600; }
+
+.stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
+.stat-card { background:white; border-radius:16px; padding:14px 10px; box-shadow:var(--shadow); border:1.5px solid var(--border); text-align:center; }
+.stat-icon { font-size:24px; margin-bottom:5px; }
+.stat-value { font-family:'Nunito',sans-serif; font-size:26px; font-weight:900; color:var(--text); line-height:1; }
+.stat-label { font-size:11px; color:var(--text-soft); font-weight:600; margin-top:3px; }
+
+.refresh-btn { display:flex; align-items:center; gap:5px; background:var(--blue-light); color:var(--blue); border:none; border-radius:10px; padding:7px 12px; font-size:12px; font-weight:700; font-family:'Noto Sans TC',sans-serif; cursor:pointer; }
+.log-header { display:grid; grid-template-columns:58px 40px 1fr auto auto auto; gap:6px; font-size:11px; font-weight:700; color:var(--text-soft); text-transform:uppercase; padding-bottom:8px; border-bottom:2px solid var(--border); align-items:center; }
+.log-row { display:grid; grid-template-columns:58px 40px 1fr auto auto auto; gap:6px; align-items:center; padding:10px 0; border-bottom:1.5px solid var(--border); font-size:13px; }
+.log-row:last-child { border-bottom:none; }
+.log-date { font-weight:700; font-size:12px; }
+.log-tray { font-size:12px; color:var(--text-soft); font-weight:600; }
+.log-hours { font-family:'Nunito',sans-serif; font-weight:800; font-size:15px; color:var(--mint-dark); text-align:center; }
+.log-check { font-size:15px; text-align:center; }
+.loading { text-align:center; color:var(--text-soft); padding:20px; font-size:14px; }
+
+/* SETTINGS */
+.field-group { margin-bottom:12px; }
+.field-label { font-size:12px; font-weight:700; color:var(--text-soft); margin-bottom:5px; display:block; }
+.field-input { width:100%; padding:11px 12px; border:2px solid var(--border); border-radius:12px; font-size:14px; font-family:'Noto Sans TC',sans-serif; color:var(--text); background:white; transition:border-color 0.2s; }
+.field-input:focus { outline:none; border-color:var(--mint); }
+.field-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.date-list { margin-top:6px; display:flex; flex-direction:column; gap:6px; }
+.date-item { display:flex; align-items:center; gap:8px; }
+.date-item input { flex:1; }
+.remove-btn { width:30px; height:30px; border:none; background:var(--coral-light); color:var(--coral); border-radius:8px; font-size:16px; font-weight:900; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.add-date-btn { width:100%; padding:10px; background:var(--bg); border:2px dashed var(--border); border-radius:12px; font-size:13px; font-weight:700; color:var(--text-soft); cursor:pointer; margin-top:6px; }
+.add-date-btn:active { background:var(--mint-light); border-color:var(--mint); }
+.ical-btn { width:100%; padding:13px; background:white; border:2px solid var(--blue-light); border-radius:14px; font-size:14px; font-weight:700; font-family:'Noto Sans TC',sans-serif; cursor:pointer; margin-bottom:8px; display:flex; align-items:center; justify-content:center; gap:7px; color:var(--blue); }
+.ical-btn.appt { border-color:var(--yellow-light); color:#b07a00; }
+.save-btn { width:100%; padding:14px; background:linear-gradient(135deg, var(--mint), var(--mint-dark)); color:white; border:none; border-radius:16px; font-size:16px; font-weight:800; font-family:'Noto Sans TC',sans-serif; cursor:pointer; box-shadow:0 5px 18px rgba(62,207,178,0.3); }
+.section-title { font-size:14px; font-weight:800; color:var(--text); margin-bottom:10px; display:flex; align-items:center; gap:6px; }
+.config-note { background:var(--yellow-light); border:1.5px solid var(--yellow); border-radius:12px; padding:12px; font-size:12px; color:#7a5c00; font-weight:600; margin-bottom:12px; line-height:1.6; }
+
+/* ===== 洗鼻子 & 呼吸訓練 ===== */
+
+/* 洗鼻子 — 單行橫排 toggle */
+.nasal-row {
+  display:flex; align-items:center; justify-content:space-between;
+  background:white; border-radius:18px; padding:14px 16px;
+  box-shadow:var(--shadow); border:1.5px solid var(--border);
+  margin-bottom:12px; cursor:pointer; transition:all 0.2s;
+}
+.nasal-row.checked {
+  border-color:var(--sky); background:var(--sky-light);
+}
+.nasal-left { display:flex; align-items:center; gap:10px; }
+.nasal-icon { font-size:24px; }
+.nasal-text { font-size:15px; font-weight:800; color:var(--text); }
+.nasal-sub  { font-size:11px; color:var(--text-soft); font-weight:600; margin-top:1px; }
+.nasal-toggle {
+  width:44px; height:26px; border-radius:13px; background:#ddd;
+  position:relative; flex-shrink:0; transition:background 0.25s;
+}
+.nasal-toggle::after {
+  content:''; position:absolute; top:3px; left:3px;
+  width:20px; height:20px; border-radius:50%; background:white;
+  box-shadow:0 1px 4px rgba(0,0,0,0.2); transition:left 0.25s;
+}
+.nasal-row.checked .nasal-toggle { background:var(--sky); }
+.nasal-row.checked .nasal-toggle::after { left:21px; }
+
+/* 呼吸訓練 — 折疊卡片 */
+.breath-card {
+  background:white; border-radius:20px; padding:0;
+  box-shadow:var(--shadow); border:1.5px solid var(--border);
+  margin-bottom:12px; overflow:hidden; transition:border-color 0.2s;
+}
+.breath-card.has-done { border-color:var(--lavender); }
+.breath-header {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 16px; cursor:pointer;
+}
+.breath-header-left { display:flex; align-items:center; gap:10px; }
+.breath-header-icon { font-size:22px; }
+.breath-header-text { font-size:15px; font-weight:800; color:var(--text); }
+.breath-header-sub { font-size:11px; color:var(--text-soft); font-weight:600; margin-top:1px; }
+.breath-toggle-btn {
+  width:44px; height:26px; border-radius:13px; background:#ddd;
+  position:relative; flex-shrink:0; transition:background 0.25s;
+  pointer-events:none; /* toggled by parent click */
+}
+.breath-toggle-btn::after {
+  content:''; position:absolute; top:3px; left:3px;
+  width:20px; height:20px; border-radius:50%; background:white;
+  box-shadow:0 1px 4px rgba(0,0,0,0.2); transition:left 0.25s;
+}
+.breath-card.has-done .breath-toggle-btn { background:var(--lavender); }
+.breath-card.has-done .breath-toggle-btn::after { left:21px; }
+
+.breath-body {
+  max-height:0; overflow:hidden;
+  transition:max-height 0.35s cubic-bezier(0.4,0,0.2,1), padding 0.25s;
+  padding:0 16px;
+}
+.breath-body.open {
+  max-height:400px;
+  padding:0 16px 16px;
+}
+
+.breath-types { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px; }
+.breath-type-btn {
+  border:2px solid var(--border); border-radius:12px;
+  padding:10px 8px; text-align:center; cursor:pointer;
+  transition:all 0.2s; background:white;
+  display:flex; flex-direction:column; align-items:center; gap:4px;
+}
+.breath-type-btn .bt-icon { font-size:20px; }
+.breath-type-btn .bt-label { font-size:12px; font-weight:700; color:var(--text); line-height:1.2; }
+.breath-type-btn.checked { border-color:var(--lavender); background:var(--lavender-light); }
+
+.breath-note-input {
+  width:100%; padding:10px 12px;
+  border:2px solid var(--border); border-radius:12px;
+  font-size:13px; font-family:'Noto Sans TC',sans-serif;
+  color:var(--text); resize:none; height:56px;
+  transition:border-color 0.2s;
+}
+.breath-note-input:focus { outline:none; border-color:var(--lavender); }
+.breath-note-label {
+  font-size:11px; font-weight:700; color:var(--text-soft);
+  margin-bottom:5px; display:block;
+}
+</style>
+</head>
+<body>
+
+<script>
+// ========== CONFIG ==========
+const CONFIG = {
+  SCRIPT_URL: "https://script.google.com/macros/s/AKfycbyiPqcvr-gkq8PmDDUk6HoJmuv-Clk79yz93wg3Pwkkli8Yopv97wocZw7NWWPS1T9p/exec",
+  SHEET_ID: "1-75VGtott7uFW-0hxX6J0n9rXg10sdcj-N-2_z1z7U0",
+  TARGET_HOURS: 22,
+  TRAY_SCHEDULE: [
+    { tray: 1, start: "2026-04-26" },
+    { tray: 2, start: "2026-05-03" },
+    { tray: 3, start: "2026-05-10" },
+    { tray: 4, start: "2026-05-17" },
+  ],
+  APPT_DATES: [
+    "2026-05-31",
+  ]
+};
+</script>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-top">
+    <h1>🦷 語芯的牙套日記<small id="headerDate"></small></h1>
+    <div class="today-badge" id="todayBadge">今天</div>
+  </div>
+  <div class="tray-row">
+    <div class="tray-chip" id="expectedChip">📦 今日應戴 — 副</div>
+    <div class="tray-chip" id="nextChip">🔄 — 天後換牙套</div>
+    <div class="tray-chip" id="apptChip">🏥 — 天後回診</div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('record')"><span class="tab-icon">✏️</span>記錄</div>
+  <div class="tab" onclick="switchTab('stats')"><span class="tab-icon">📊</span>統計</div>
+  <div class="tab" onclick="switchTab('settings')"><span class="tab-icon">⚙️</span>設定</div>
+</div>
+
+<!-- ===== RECORD PAGE ===== -->
+<div class="page active" id="page-record">
+
+  <!-- Date picker -->
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;background:white;border-radius:16px;padding:12px 14px;box-shadow:var(--shadow);border:1.5px solid var(--border);">
+    <span style="font-size:18px;">📅</span>
+    <div style="flex:1;">
+      <div style="font-size:11px;font-weight:700;color:var(--text-soft);margin-bottom:3px;">記錄日期</div>
+      <input type="date" id="recordDate" style="border:none;font-size:15px;font-weight:700;color:var(--text);font-family:'Noto Sans TC',sans-serif;width:100%;background:transparent;" onchange="onDateChange()">
+    </div>
+    <button onclick="setRecordDate(0)" id="todayBtn" style="background:var(--mint-light);color:var(--mint-dark);border:none;border-radius:10px;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;">今天</button>
+    <button onclick="setRecordDate(-1)" style="background:var(--bg);color:var(--text-soft);border:1.5px solid var(--border);border-radius:10px;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;">昨天</button>
+  </div>
+
+  <!-- Hours -->
+  <div class="card">
+    <div class="card-title">⏱️ 今日配戴時數</div>
+    <div class="hours-big">
+      <div class="hours-num" id="hoursNum">22</div>
+      <div class="hours-unit">小時</div>
+    </div>
+    <div class="hours-controls">
+      <button class="h-btn minus" onclick="changeHours(-1)">−1</button>
+      <button class="h-btn minus half" onclick="changeHours(-0.5)">−½</button>
+      <button class="h-btn plus half" onclick="changeHours(0.5)">+½</button>
+      <button class="h-btn plus" onclick="changeHours(1)">+1</button>
+    </div>
+    <div class="hours-presets">
+      <button class="preset-btn" onclick="setHours(23)">23h</button>
+      <button class="preset-btn" onclick="setHours(22)">22h</button>
+      <button class="preset-btn" onclick="setHours(21)">21h</button>
+      <button class="preset-btn" onclick="setHours(20)">20h</button>
+    </div>
+    <div class="hours-bar-wrap">
+      <div class="hours-bar"><div class="hours-bar-fill" id="hoursBar" style="width:100%"></div></div>
+      <div class="hours-status" id="hoursStatus">✅ 已達目標 22 小時</div>
+    </div>
+  </div>
+
+  <!-- Brushing -->
+  <div class="card">
+    <div class="card-title">🪥 口腔護理記錄</div>
+    <div id="sessionsContainer">
+      <!-- 早 -->
+      <div class="session-block" data-session="morning">
+        <div class="session-header" onclick="toggleSession(this)">
+          <div class="session-label">🌅 早上<span class="session-summary" id="sum-morning"> · 未記錄</span></div>
+          <div class="session-chevron">▼</div>
+        </div>
+        <div class="session-body">
+          <div class="care-grid">
+            <div class="care-btn" onclick="toggleCare(this,'morning','brush')"><span class="care-icon">🪥</span><div class="care-label">刷牙</div></div>
+            <div class="care-btn" onclick="toggleCare(this,'morning','floss')"><span class="care-icon">🧵</span><div class="care-label">牙線</div></div>
+            <div class="care-btn" onclick="toggleCare(this,'morning','rinse_water')"><span class="care-icon">💧</span><div class="care-label">漱口水</div></div>
+            <div class="care-btn" onclick="toggleCare(this,'morning','rinse')"><span class="care-icon">🫧</span><div class="care-label">漱口</div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div class="care-btn skip-btn" onclick="toggleSkip(this,'morning')" style="text-align:center;padding:10px;">
+              <span class="care-icon" style="display:inline">🚫</span> <span style="font-size:12px;font-weight:700;">跳過（未吃東西）</span>
+            </div>
+            <div class="care-btn none-btn" onclick="toggleNone(this,'morning')" style="text-align:center;padding:10px;">
+              <span class="care-icon" style="display:inline">😴</span> <span style="font-size:12px;font-weight:700;">這個時段完全沒做</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 午 -->
+      <div class="session-block" data-session="noon">
+        <div class="session-header" onclick="toggleSession(this)">
+          <div class="session-label">☀️ 午後<span class="session-summary" id="sum-noon"> · 未記錄</span></div>
+          <div class="session-chevron">▼</div>
+        </div>
+        <div class="session-body">
+          <div class="care-grid">
+            <div class="care-btn" onclick="toggleCare(this,'noon','brush')"><span class="care-icon">🪥</span><div class="care-label">刷牙</div></div>
+            <div class="care-btn" onclick="toggleCare(this,'noon','floss')"><span class="care-icon">🧵</span><div class="care-label">牙線</div></div>
+            <div class="care-btn" onclick="toggleCare(this,'noon','rinse_water')"><span class="care-icon">💧</span><div class="care-label">漱口水</div></div>
+            <div class="care-btn" onclick="toggleCare(this,'noon','rinse')"><span class="care-icon">🫧</span><div class="care-label">漱口</div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div class="care-btn skip-btn" onclick="toggleSkip(this,'noon')" style="text-align:center;padding:10px;">
+              <span class="care-icon" style="display:inline">🚫</span> <span style="font-size:12px;font-weight:700;">跳過（未吃東西）</span>
+            </div>
+            <div class="care-btn none-btn" onclick="toggleNone(this,'noon')" style="text-align:center;padding:10px;">
+              <span class="care-icon" style="display:inline">😴</span> <span style="font-size:12px;font-weight:700;">這個時段完全沒做</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 晚 -->
+      <div class="session-block" data-session="night">
+        <div class="session-header" onclick="toggleSession(this)">
+          <div class="session-label">🌙 晚上<span class="session-summary" id="sum-night"> · 未記錄</span></div>
+          <div class="session-chevron">▼</div>
+        </div>
+        <div class="session-body">
+          <div class="care-grid">
+            <div class="care-btn" onclick="toggleCare(this,'night','brush')"><span class="care-icon">🪥</span><div class="care-label">刷牙</div></div>
+            <div class="care-btn" onclick="toggleCare(this,'night','floss')"><span class="care-icon">🧵</span><div class="care-label">牙線</div></div>
+            <div class="care-btn" onclick="toggleCare(this,'night','rinse_water')"><span class="care-icon">💧</span><div class="care-label">漱口水</div></div>
+            <div class="care-btn" onclick="toggleCare(this,'night','rinse')"><span class="care-icon">🫧</span><div class="care-label">漱口</div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div class="care-btn skip-btn" onclick="toggleSkip(this,'night')" style="text-align:center;padding:10px;">
+              <span class="care-icon" style="display:inline">🚫</span> <span style="font-size:12px;font-weight:700;">跳過（未吃東西）</span>
+            </div>
+            <div class="care-btn none-btn" onclick="toggleNone(this,'night')" style="text-align:center;padding:10px;">
+              <span class="care-icon" style="display:inline">😴</span> <span style="font-size:12px;font-weight:700;">這個時段完全沒做</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="add-snack-btn" onclick="addSnackSession()">＋ 新增點心時段</button>
+    </div>
+  </div>
+
+  <!-- 洗鼻子 -->
+  <div class="nasal-row" id="nasalRow" onclick="toggleNasal()">
+    <div class="nasal-left">
+      <div class="nasal-icon">🌊</div>
+      <div>
+        <div class="nasal-text">今天有洗鼻子</div>
+        <div class="nasal-sub" id="nasalSub">點一下記錄</div>
+      </div>
+    </div>
+    <div class="nasal-toggle" id="nasalToggle"></div>
+  </div>
+
+  <!-- 呼吸訓練 -->
+  <div class="breath-card" id="breathCard">
+    <div class="breath-header" onclick="toggleBreath()">
+      <div class="breath-header-left">
+        <div class="breath-header-icon">🫁</div>
+        <div>
+          <div class="breath-header-text">今天有做呼吸訓練</div>
+          <div class="breath-header-sub" id="breathHeaderSub">點一下展開記錄</div>
+        </div>
+      </div>
+      <div class="breath-toggle-btn" id="breathToggleBtn"></div>
+    </div>
+    <div class="breath-body" id="breathBody">
+      <div class="breath-types" id="breathTypes">
+        <div class="breath-type-btn" onclick="toggleBreathType(this,'box')">
+          <div class="bt-icon">⬛</div>
+          <div class="bt-label">Box 呼吸<br><span style="font-weight:500;color:var(--text-soft);font-size:10px;">4-4-4-4</span></div>
+        </div>
+        <div class="breath-type-btn" onclick="toggleBreathType(this,'478')">
+          <div class="bt-icon">🌙</div>
+          <div class="bt-label">4-7-8<br><span style="font-weight:500;color:var(--text-soft);font-size:10px;">放鬆助眠</span></div>
+        </div>
+        <div class="breath-type-btn" onclick="toggleBreathType(this,'belly')">
+          <div class="bt-icon">🫃</div>
+          <div class="bt-label">腹式呼吸<br><span style="font-weight:500;color:var(--text-soft);font-size:10px;">橫膈膜訓練</span></div>
+        </div>
+        <div class="breath-type-btn" onclick="toggleBreathType(this,'nasal_cycle')">
+          <div class="bt-icon">👃</div>
+          <div class="bt-label">鼻孔交替<br><span style="font-weight:500;color:var(--text-soft);font-size:10px;">Nadi Shodhana</span></div>
+        </div>
+        <div class="breath-type-btn" onclick="toggleBreathType(this,'coherent')">
+          <div class="bt-icon">〰️</div>
+          <div class="bt-label">共振呼吸<br><span style="font-weight:500;color:var(--text-soft);font-size:10px;">5秒吸/5秒吐</span></div>
+        </div>
+        <div class="breath-type-btn" onclick="toggleBreathType(this,'other')">
+          <div class="bt-icon">✨</div>
+          <div class="bt-label">其他<br><span style="font-weight:500;color:var(--text-soft);font-size:10px;">見備注</span></div>
+        </div>
+      </div>
+      <label class="breath-note-label">備注（時長、感受、其他說明）</label>
+      <textarea class="breath-note-input" id="breathNote" placeholder="例：Box 呼吸 10 分鐘，睡前做，感覺放鬆…"></textarea>
+    </div>
+  </div>
+
+  <!-- Tray -->
+  <div class="card">
+    <div class="card-title">📦 今日牙套</div>
+    <div class="tray-expected" id="trayExpectedText">今日應戴：計算中…</div>
+    <div class="tray-actual-row">
+      <button class="tray-adj-btn minus" onclick="changeTray(-1)">−</button>
+      <div style="flex:1;text-align:center;">
+        <div class="tray-num-display" id="trayNum">—</div>
+        <div style="font-size:12px;color:var(--text-soft);font-weight:600;">實際配戴副數</div>
+      </div>
+      <button class="tray-adj-btn plus" onclick="changeTray(1)">＋</button>
+    </div>
+    <div class="tray-match" id="trayMatch"></div>
+  </div>
+
+  <!-- Note -->
+  <div class="card">
+    <div class="card-title">📝 備註</div>
+    <textarea class="note-input" id="noteInput" placeholder="今天有哪裡不舒服、特別狀況…（可空白）"></textarea>
+  </div>
+
+  <button class="submit-btn" id="submitBtn" onclick="submitRecord()">💾 儲存今日記錄</button>
+  <div class="status-msg" id="statusMsg"></div>
+</div>
+
+<!-- ===== STATS PAGE ===== -->
+<div class="page" id="page-stats">
+  <div class="countdown-row">
+    <div class="countdown-card tray">
+      <div class="countdown-days" id="statTrayDays">—</div>
+      <div class="countdown-unit">天後</div>
+      <div class="countdown-label">🔄 換牙套</div>
+      <div class="countdown-date" id="statTrayDate"></div>
+    </div>
+    <div class="countdown-card appt">
+      <div class="countdown-days" id="statApptDays">—</div>
+      <div class="countdown-unit">天後</div>
+      <div class="countdown-label">🏥 回診</div>
+      <div class="countdown-date" id="statApptDate"></div>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
+    <input type="date" id="statFrom" style="flex:1;padding:7px 10px;border-radius:10px;border:1.5px solid var(--border);font-size:13px;font-family:inherit;">
+    <span style="font-size:13px;color:var(--text-soft);font-weight:700;">～</span>
+    <input type="date" id="statTo" style="flex:1;padding:7px 10px;border-radius:10px;border:1.5px solid var(--border);font-size:13px;font-family:inherit;">
+    <button onclick="loadStats()" style="background:var(--mint);color:white;border:none;border-radius:10px;padding:7px 14px;font-size:13px;font-weight:700;cursor:pointer;">查詢</button>
+  </div>
+  <div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;">
+    <button onclick="setStatRange(7)" style="background:var(--mint-light);color:var(--mint-dark);border:none;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;">近7天</button>
+    <button onclick="setStatRange(30)" style="background:var(--mint-light);color:var(--mint-dark);border:none;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;">近30天</button>
+    <button onclick="setStatRange(90)" style="background:var(--mint-light);color:var(--mint-dark);border:none;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;">近3個月</button>
+  </div>
+  <div class="stats-grid">
+	<div class="stat-card"><div class="stat-icon">⏱️</div><div class="stat-value" id="avgHours">—</div><div class="stat-label" id="avgHoursLabel">平均時數</div></div>
+	<div class="stat-card"><div class="stat-icon">🪥</div><div class="stat-value" id="brushRate">—</div><div class="stat-label" id="brushRateLabel">早晚刷牙達成率</div></div>
+	<div class="stat-card"><div class="stat-icon">🌊</div><div class="stat-value" id="nasalRate">—</div><div class="stat-label" id="nasalRateLabel">洗鼻子達成率</div></div>
+	<div class="stat-card"><div class="stat-icon">🫁</div><div class="stat-value" id="breathRate">—</div><div class="stat-label" id="breathRateLabel">呼吸訓練達成率</div></div>
+  </div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <div class="section-title">📋 最近記錄</div>
+      <button class="refresh-btn" onclick="loadStats()">🔄 更新</button>
+    </div>
+    <div id="logContainer"><div class="loading">點「更新」載入資料</div></div>
+  </div>
+</div>
+
+<!-- ===== SETTINGS PAGE ===== -->
+<div class="page" id="page-settings">
+  <div class="config-note" id="syncNote">☁️ 換片行程與回診日期會同步到 Google Sheets，兩支手機共用同一份設定。</div>
+  <div class="card">
+    <div class="section-title">📦 牙套換片行程</div>
+    <p style="font-size:12px;color:var(--text-soft);margin-bottom:10px;font-weight:600;">每副的開始日期（每週換一次，可一次輸入多副）</p>
+    <div class="date-list" id="trayScheduleList"></div>
+    <button class="add-date-btn" onclick="addTrayRow()">＋ 新增一副</button>
+  </div>
+  <div class="card">
+    <div class="section-title">🏥 回診日期</div>
+    <div class="date-list" id="apptDateList"></div>
+    <button class="add-date-btn" onclick="addApptRow()">＋ 新增回診日</button>
+  </div>
+  <div class="card">
+    <div class="section-title">⚙️ 其他設定</div>
+    <div class="field-group">
+      <label class="field-label">每日目標配戴時數</label>
+      <input class="field-input" type="number" id="set-target" value="22" min="1" max="24">
+    </div>
+    <div class="field-group">
+      <label class="field-label">Apps Script 網址（寫入用）</label>
+      <input class="field-input" type="url" id="set-script" placeholder="https://script.google.com/macros/s/...">
+    </div>
+    <div class="field-group" style="margin-bottom:0">
+      <label class="field-label">存取密碼（Token）</label>
+      <input class="field-input" type="password" id="set-token" placeholder="與 Apps Script 設定的密碼相同">
+    </div>
+  </div>
+  <button class="ical-btn" onclick="generateAllIcal('tray')">📅 下載所有換牙套提醒 (.ics)</button>
+  <button class="ical-btn appt" onclick="generateAllIcal('appt')">📅 下載所有回診提醒 (.ics)</button>
+  <button class="save-btn" id="saveBtn" onclick="saveSettings()">☁️ 儲存並同步設定</button>
+  <div class="status-msg" id="settingsMsg"></div>
+</div>
+
+<script>
+// ===== STATE =====
+let hours = 22;
+let careData = {};
+let snackCount = 0;
+let actualTray = null;
+let expectedTray = null;
+let nasalDone = false;
+let breathDone = false;
+let breathTypes = {}; // { box: true, belly: false, ... }
+
+// ===== NASAL RINSE =====
+function toggleNasal() {
+  nasalDone = !nasalDone;
+  const row = document.getElementById('nasalRow');
+  row.classList.toggle('checked', nasalDone);
+  document.getElementById('nasalSub').textContent = nasalDone ? '✅ 今天有洗' : '點一下記錄';
+}
+
+function resetNasal() {
+  nasalDone = false;
+  document.getElementById('nasalRow').classList.remove('checked');
+  document.getElementById('nasalSub').textContent = '點一下記錄';
+}
+
+// ===== BREATH TRAINING =====
+function toggleBreath() {
+  breathDone = !breathDone;
+  const card = document.getElementById('breathCard');
+  const body = document.getElementById('breathBody');
+  card.classList.toggle('has-done', breathDone);
+  body.classList.toggle('open', breathDone);
+  document.getElementById('breathHeaderSub').textContent = breathDone ? '展開中，請勾選種類' : '點一下展開記錄';
+  if (!breathDone) {
+    // clear all type selections when toggling off
+    breathTypes = {};
+    document.querySelectorAll('.breath-type-btn').forEach(b => b.classList.remove('checked'));
+    document.getElementById('breathNote').value = '';
+  }
+}
+
+function toggleBreathType(btn, type) {
+  breathTypes[type] = !breathTypes[type];
+  btn.classList.toggle('checked', breathTypes[type]);
+  updateBreathHeaderSub();
+}
+
+function updateBreathHeaderSub() {
+  const labels = {box:'Box',['478']:'4-7-8',belly:'腹式',nasal_cycle:'鼻孔交替',coherent:'共振',other:'其他'};
+  const done = Object.keys(breathTypes).filter(k => breathTypes[k]).map(k => labels[k] || k);
+  document.getElementById('breathHeaderSub').textContent = done.length > 0
+    ? '✅ ' + done.join('、') : '展開中，請勾選種類';
+}
+
+function resetBreath() {
+  breathDone = false;
+  breathTypes = {};
+  const card = document.getElementById('breathCard');
+  const body = document.getElementById('breathBody');
+  card.classList.remove('has-done');
+  body.classList.remove('open');
+  document.querySelectorAll('.breath-type-btn').forEach(b => b.classList.remove('checked'));
+  document.getElementById('breathNote').value = '';
+  document.getElementById('breathHeaderSub').textContent = '點一下展開記錄';
+}
+
+// ===== INIT =====
+window.onload = async function() {
+  const saved = localStorage.getItem('braces_cfg');
+  if (saved) try { Object.assign(CONFIG, JSON.parse(saved)); } catch(e){}
+
+  const now = new Date();
+  const dayNames = ['日','一','二','三','四','五','六'];
+  document.getElementById('headerDate').textContent = `　${now.getMonth()+1}月${now.getDate()}日 週${dayNames[now.getDay()]}`;
+  document.getElementById('todayBadge').textContent = `今天`;
+
+  ['morning','noon','night'].forEach(s => { careData[s] = {brush:false,floss:false,rinse_water:false,rinse:false,none:false,skip:false}; });
+
+  try { await loadSettingsFromSheets(); } catch(e) { console.log('settings load failed', e); }
+
+  renderTraySchedule();
+  renderApptDates();
+  document.getElementById('set-target').value = CONFIG.TARGET_HOURS;
+  document.getElementById('set-script').value = CONFIG.SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL_HERE' ? CONFIG.SCRIPT_URL : '';
+  document.getElementById('set-token').value = CONFIG.TOKEN || '';
+
+  document.getElementById('recordDate').value = toDateStr(new Date());
+
+  // 統計預設區間：近30天
+  const statTo = new Date();
+  const statFrom = new Date(); statFrom.setDate(statFrom.getDate() - 29);
+  document.getElementById('statTo').value = toDateStr(statTo);
+  document.getElementById('statFrom').value = toDateStr(statFrom);
+   
+  refreshUIFromConfig();
+  updateHoursUI();
+
+  try { await loadTodayRecord(); } catch(e) { console.log('today record load failed', e); }
+};
+
+async function loadSettingsFromSheets() {
+  if (!CONFIG.SHEET_ID) return;
+  try {
+    const url = `https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/gviz/tq?tqx=out:json&sheet=settings`;
+    const resp = await fetch(url);
+    const text = await resp.text();
+    const json = JSON.parse(text.substring(47, text.length - 2));
+    const rows = json.table.rows;
+    if (!rows || rows.length === 0) return;
+    const map = {};
+    rows.forEach(r => { if (r.c[0]?.v && r.c[1]?.v) map[r.c[0].v] = r.c[1].v; });
+    if (map.TRAY_SCHEDULE) try { CONFIG.TRAY_SCHEDULE = JSON.parse(map.TRAY_SCHEDULE); } catch(e){}
+    if (map.APPT_DATES) try { CONFIG.APPT_DATES = JSON.parse(map.APPT_DATES); } catch(e){}
+    if (map.TARGET_HOURS) CONFIG.TARGET_HOURS = parseInt(map.TARGET_HOURS) || 22;
+  } catch(e) {}
+}
+
+function setStatRange(days) {
+  const to = new Date();
+  const from = new Date(); from.setDate(from.getDate() - (days - 1));
+  document.getElementById('statTo').value = toDateStr(to);
+  document.getElementById('statFrom').value = toDateStr(from);
+  loadStats();
+}
+
+function refreshUIFromConfig() {
+  expectedTray = getExpectedTray();
+  actualTray = expectedTray;
+  document.getElementById('trayNum').textContent = actualTray || '—';
+  const expText = expectedTray ? `今日應戴：第 ${expectedTray} 副` : '今日應戴：請先在設定填入換片行程';
+  document.getElementById('trayExpectedText').textContent = expText;
+  document.getElementById('expectedChip').textContent = `📦 今日應戴第 ${expectedTray || '?'} 副`;
+  updateTrayMatch();
+  updateCountdowns();
+}
+
+async function loadTodayRecord() {
+	const msg = document.getElementById('statusMsg');
+	msg.className = 'status-msg success';
+	msg.textContent = '⏳ 連線中…';
+
+	const dateStr = document.getElementById('recordDate').value;
+	try {
+	  msg.textContent = `⏳ 讀取 ${dateStr} 的記錄…`;
+	  const url = `${CONFIG.SCRIPT_URL}?date=${dateStr}&token=${encodeURIComponent(CONFIG.TOKEN||'')}`;
+	const resp = await fetch(url);
+	const result = await resp.json();
+
+	let found = null;
+	if (result.status === 'ok' && result.found) {
+	  found = result.data;
+	}
+
+    if (!found) {
+      msg.textContent = `📭 ${dateStr} 尚無記錄`;
+      setTimeout(() => { msg.className = 'status-msg'; }, 3000);
+      return;
+    }
+
+    setHours(parseFloat(found.hours) || 0);
+
+    if (found.tray_actual) {
+      actualTray = parseInt(found.tray_actual);
+      document.getElementById('trayNum').textContent = actualTray;
+      updateTrayMatch();
+    }
+
+    if (found.note) document.getElementById('noteInput').value = found.note;
+
+    // 還原洗鼻子
+    if (found.nasal === true || found.nasal === 1 || found.nasal === '1' || found.nasal === 'TRUE') {
+      nasalDone = true;
+      document.getElementById('nasalRow').classList.add('checked');
+      document.getElementById('nasalSub').textContent = '✅ 今天有洗';
+    }
+
+    // 還原呼吸訓練
+    if (found.breath) {
+      try {
+        const bd = JSON.parse(found.breath);
+        if (bd.done) {
+          breathDone = true;
+          breathTypes = bd.types || {};
+          const card = document.getElementById('breathCard');
+          const body = document.getElementById('breathBody');
+          card.classList.add('has-done');
+          body.classList.add('open');
+          document.querySelectorAll('.breath-type-btn').forEach(btn => {
+            const t = btn.getAttribute('onclick').match(/'([^']+)'\)$/)?.[1];
+            if (t && breathTypes[t]) btn.classList.add('checked');
+          });
+          if (bd.note) document.getElementById('breathNote').value = bd.note;
+          updateBreathHeaderSub();
+        }
+      } catch(e) {}
+    }
+
+	// 還原口腔護理
+    if (found.sessions) {
+      try {
+        const sessions = JSON.parse(found.sessions);
+        Object.keys(sessions).forEach(sessionId => {
+          const sData = sessions[sessionId];
+          careData[sessionId] = sData;
+
+          // 點心時段：先動態建立 DOM
+          if (sessionId.startsWith('snack')) {
+            const num = parseInt(sessionId.replace('snack', '')) || 1;
+            if (num > snackCount) snackCount = num;
+            const div = document.createElement('div');
+            div.className = 'session-block';
+            div.dataset.session = sessionId;
+            div.innerHTML = `
+              <div class="session-header" onclick="toggleSession(this)">
+                <div class="session-label">🍪 點心${num}<span class="session-summary" id="sum-${sessionId}"> · 未記錄</span></div>
+                <div style="display:flex;gap:8px;align-items:center;">
+                  <button onclick="event.stopPropagation();removeSession('${sessionId}',this)" style="background:var(--coral-light);color:var(--coral);border:none;border-radius:7px;padding:3px 8px;font-size:12px;font-weight:700;cursor:pointer;">刪除</button>
+                  <div class="session-chevron open">▼</div>
+                </div>
+              </div>
+              <div class="session-body open">
+                <div class="care-grid">
+                  <div class="care-btn" onclick="toggleCare(this,'${sessionId}','brush')"><span class="care-icon">🪥</span><div class="care-label">刷牙</div></div>
+                  <div class="care-btn" onclick="toggleCare(this,'${sessionId}','floss')"><span class="care-icon">🧵</span><div class="care-label">牙線</div></div>
+                  <div class="care-btn" onclick="toggleCare(this,'${sessionId}','rinse_water')"><span class="care-icon">💧</span><div class="care-label">漱口水</div></div>
+                  <div class="care-btn" onclick="toggleCare(this,'${sessionId}','rinse')"><span class="care-icon">🫧</span><div class="care-label">漱口</div></div>
+                </div>
+                <input type="text" class="snack-note-input" placeholder="點心備注（吃什麼、幾點…）"
+                  oninput="careData['${sessionId}'].snackNote=this.value"
+                  style="width:100%;margin-top:8px;padding:8px 12px;border-radius:10px;border:1.5px solid var(--border);font-size:13px;font-family:inherit;color:var(--text);background:var(--bg);outline:none;">
+                <div class="care-btn none-btn" onclick="toggleNone(this,'${sessionId}')" style="width:100%;text-align:center;padding:10px;margin-top:8px;">
+                  <span class="care-icon" style="display:inline">😴</span> <span style="font-size:13px;font-weight:700;">這個時段完全沒做</span>
+                </div>
+              </div>`;
+            const container = document.getElementById('sessionsContainer');
+            const addBtn = container.querySelector('.add-snack-btn');
+            container.insertBefore(div, addBtn);
+          }
+
+          // 還原勾選狀態（固定時段 + 點心都走這裡）
+          const block = document.querySelector(`[data-session="${sessionId}"]`);
+          if (!block) return;
+          const careKeys = ['brush','floss','rinse_water','rinse'];
+          const careBtns = block.querySelectorAll('.care-grid .care-btn');
+          careBtns.forEach((btn, i) => {
+            if (careKeys[i] && sData[careKeys[i]]) btn.classList.add('checked');
+          });
+          if (sData.none) { const b = block.querySelector('.none-btn'); if(b) b.classList.add('checked'); }
+          if (sData.skip) { const b = block.querySelector('.skip-btn'); if(b) b.classList.add('checked'); }
+          // 還原點心備注
+          const snackNoteInput = block.querySelector('.snack-note-input');
+          if (snackNoteInput && sData.snackNote) snackNoteInput.value = sData.snackNote;
+          updateSessionSummary(sessionId);
+        });
+        renumberSnacks(); // 還原完後重新編號
+      } catch(e) {}
+    }
+
+    msg.textContent = '📂 已載入今日記錄，可繼續修改後重新儲存。';
+  } catch(e) {
+    msg.className = 'status-msg error';
+    msg.textContent = `❌ 讀取失敗：${e.message}`;
+  }
+}
+
+function toDateStr(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function setRecordDate(offset) {
+  const d = new Date(); d.setDate(d.getDate() + offset);
+  document.getElementById('recordDate').value = toDateStr(d);
+  onDateChange();
+}
+function onDateChange() {
+  const today = toDateStr(new Date());
+  const selected = document.getElementById('recordDate').value;
+  const btn = document.getElementById('todayBtn');
+  if (selected === today) {
+    btn.style.background = 'var(--mint-light)'; btn.style.color = 'var(--mint-dark)'; btn.style.border = 'none';
+  } else {
+    btn.style.background = 'var(--bg)'; btn.style.color = 'var(--text-soft)'; btn.style.border = '1.5px solid var(--border)';
+  }
+  resetRecord();
+  loadTodayRecord();
+}
+
+function resetRecord() {
+  setHours(22);
+  ['morning','noon','night'].forEach(s => {
+    careData[s] = {brush:false,floss:false,rinse_water:false,rinse:false,none:false,skip:false};
+    const block = document.querySelector(`[data-session="${s}"]`);
+    if (block) block.querySelectorAll('.care-btn').forEach(b => b.classList.remove('checked'));
+    updateSessionSummary(s);
+  });
+  actualTray = expectedTray;
+  document.getElementById('trayNum').textContent = actualTray || '—';
+  updateTrayMatch();
+  document.getElementById('noteInput').value = '';
+  document.getElementById('statusMsg').className = 'status-msg';
+  resetNasal();
+  resetBreath();
+}
+
+function getExpectedTray() {
+  if (!CONFIG.TRAY_SCHEDULE || CONFIG.TRAY_SCHEDULE.length === 0) return null;
+  const today = new Date(); today.setHours(0,0,0,0);
+  let result = null;
+  CONFIG.TRAY_SCHEDULE.forEach(item => {
+    const d = new Date(item.start); d.setHours(0,0,0,0);
+    if (d <= today) result = item.tray;
+  });
+  return result;
+}
+
+function changeHours(delta) { setHours(hours + delta); }
+function setHours(val) {
+  hours = Math.max(0, Math.min(24, val));
+  document.getElementById('hoursNum').textContent = hours;
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  updateHoursUI();
+}
+function updateHoursUI() {
+  const pct = Math.min(100, (hours / CONFIG.TARGET_HOURS) * 100);
+  document.getElementById('hoursBar').style.width = pct + '%';
+  const diff = CONFIG.TARGET_HOURS - hours;
+  document.getElementById('hoursStatus').textContent = diff <= 0
+    ? `🎉 已達目標 ${CONFIG.TARGET_HOURS} 小時！`
+    : `目標 ${CONFIG.TARGET_HOURS} 小時，還差 ${diff} 小時`;
+}
+
+function toggleSession(header) {
+  const body = header.nextElementSibling;
+  const chev = header.querySelector('.session-chevron');
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  chev.classList.toggle('open', !isOpen);
+}
+
+function toggleCare(btn, session, key) {
+  if (!careData[session]) careData[session] = {};
+  if (careData[session].none) {
+    careData[session].none = false;
+    const noneBtn = btn.closest('.session-body').querySelector('.none-btn');
+    if (noneBtn) noneBtn.classList.remove('checked');
+  }
+  careData[session][key] = !careData[session][key];
+  btn.classList.toggle('checked', careData[session][key]);
+  updateSessionSummary(session);
+}
+
+function toggleSkip(btn, session) {
+  if (!careData[session]) careData[session] = {};
+  const wasSkip = careData[session].skip;
+  careData[session] = {brush:false, floss:false, rinse_water:false, rinse:false, none:false, skip: !wasSkip};
+  btn.closest('.session-body').querySelectorAll('.care-btn:not(.skip-btn)').forEach(b => b.classList.remove('checked'));
+  btn.classList.toggle('checked', !wasSkip);
+  updateSessionSummary(session);
+}
+
+function toggleNone(btn, session) {
+  if (!careData[session]) careData[session] = {};
+  const wasNone = careData[session].none;
+  careData[session] = {brush:false, floss:false, rinse_water:false, rinse:false, none: !wasNone, skip:false};
+  btn.closest('.session-body').querySelectorAll('.care-btn:not(.none-btn)').forEach(b => b.classList.remove('checked'));
+  btn.classList.toggle('checked', !wasNone);
+  updateSessionSummary(session);
+}
+
+function updateSessionSummary(session) {
+  const d = careData[session] || {};
+  const el = document.getElementById('sum-' + session);
+  if (!el) return;
+  if (d.skip) { el.textContent = ' · 跳過（未吃東西）'; el.style.color = '#aaa'; return; }
+  if (d.none) { el.textContent = ' · 未執行'; el.style.color = 'var(--coral)'; return; }
+  const done = [d.brush&&'刷牙', d.floss&&'牙線', d.rinse_water&&'漱口水', d.rinse&&'漱口'].filter(Boolean);
+  if (done.length === 0) { el.textContent = ' · 未記錄'; el.style.color = 'var(--text-soft)'; }
+  else { el.textContent = ' · ' + done.join('、'); el.style.color = 'var(--mint-dark)'; }
+}
+
+function addSnackSession() {
+  snackCount++;
+  const id = 'snack' + snackCount;
+  // 計算目前實際有幾個點心，決定顯示編號
+  const existingSnacks = document.querySelectorAll('[data-session^="snack"]').length;
+  const displayNum = existingSnacks + 1;
+  careData[id] = {brush:false, floss:false, rinse_water:false, rinse:false, none:false, snackNote:''};
+  const div = document.createElement('div');
+  div.className = 'session-block';
+  div.dataset.session = id;
+  div.innerHTML = `
+    <div class="session-header" onclick="toggleSession(this)">
+      <div class="session-label">🍪 點心${displayNum}<span class="session-summary" id="sum-${id}"> · 未記錄</span></div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button onclick="event.stopPropagation();removeSession('${id}',this)" style="background:var(--coral-light);color:var(--coral);border:none;border-radius:7px;padding:3px 8px;font-size:12px;font-weight:700;cursor:pointer;">刪除</button>
+        <div class="session-chevron open">▼</div>
+      </div>
+    </div>
+    <div class="session-body open">
+      <div class="care-grid">
+        <div class="care-btn" onclick="toggleCare(this,'${id}','brush')"><span class="care-icon">🪥</span><div class="care-label">刷牙</div></div>
+        <div class="care-btn" onclick="toggleCare(this,'${id}','floss')"><span class="care-icon">🧵</span><div class="care-label">牙線</div></div>
+        <div class="care-btn" onclick="toggleCare(this,'${id}','rinse_water')"><span class="care-icon">💧</span><div class="care-label">漱口水</div></div>
+        <div class="care-btn" onclick="toggleCare(this,'${id}','rinse')"><span class="care-icon">🫧</span><div class="care-label">漱口</div></div>
+      </div>
+      <input type="text" class="snack-note-input" placeholder="點心備注（吃什麼、幾點…）"
+        oninput="careData['${id}'].snackNote=this.value"
+        style="width:100%;margin-top:8px;padding:8px 12px;border-radius:10px;border:1.5px solid var(--border);font-size:13px;font-family:inherit;color:var(--text);background:var(--bg);outline:none;">
+      <div class="care-btn none-btn" onclick="toggleNone(this,'${id}')" style="width:100%;text-align:center;padding:10px;margin-top:8px;">
+        <span class="care-icon" style="display:inline">😴</span> <span style="font-size:13px;font-weight:700;">這個時段完全沒做</span>
+      </div>
+    </div>`;
+  document.getElementById('sessionsContainer').insertBefore(div, document.getElementById('sessionsContainer').querySelector('.add-snack-btn'));
+  renumberSnacks(); // 重新編號
+}
+
+function removeSession(id, btn) {
+  delete careData[id];
+  btn.closest('.session-block').remove();
+  renumberSnacks(); 
+}
+
+function renumberSnacks() {
+  const blocks = document.querySelectorAll('[data-session^="snack"]');
+  blocks.forEach((block, i) => {
+    const label = block.querySelector('.session-label');
+    const id = block.dataset.session;
+    const sumEl = document.getElementById('sum-' + id);
+    // 只更新顯示的數字，data-session 不變（避免影響 careData）
+    label.childNodes[0].textContent = `🍪 點心${i + 1}`;
+  });
+}
+
+function changeTray(delta) {
+  if (actualTray === null) actualTray = expectedTray || 1;
+  actualTray = Math.max(1, actualTray + delta);
+  document.getElementById('trayNum').textContent = actualTray;
+  updateTrayMatch();
+}
+function updateTrayMatch() {
+  const el = document.getElementById('trayMatch');
+  if (!expectedTray || actualTray === null) { el.textContent = ''; return; }
+  if (actualTray === expectedTray) { el.textContent = '✅ 符合今日進度'; el.className = 'tray-match ok'; }
+  else { el.textContent = `⚠️ 與預期第 ${expectedTray} 副不同`; el.className = 'tray-match diff'; }
+}
+
+function updateCountdowns() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  function daysUntil(ds) {
+    if (!ds) return null;
+    const d = new Date(ds); d.setHours(0,0,0,0);
+    return Math.ceil((d - today) / 86400000);
+  }
+  function nextFuture(arr) {
+    if (!arr || arr.length === 0) return null;
+    const future = arr.map(ds => ({ds, diff: daysUntil(ds)})).filter(x => x.diff >= 0).sort((a,b)=>a.diff-b.diff);
+    return future[0] || null;
+  }
+
+  let nextTray = null;
+  if (CONFIG.TRAY_SCHEDULE && CONFIG.TRAY_SCHEDULE.length > 0) {
+    const future = CONFIG.TRAY_SCHEDULE.map(x => ({tray:x.tray, ds:x.start, diff:daysUntil(x.start)}))
+      .filter(x => x.diff > 0).sort((a,b)=>a.diff-b.diff);
+    nextTray = future[0] || null;
+  }
+  const nextAppt = nextFuture(CONFIG.APPT_DATES);
+
+  const trayDays = nextTray ? nextTray.diff : null;
+  const apptDays = nextAppt ? nextAppt.diff : null;
+
+  document.getElementById('nextChip').textContent = trayDays != null ? `🔄 ${trayDays} 天後換牙套` : '🔄 未設換片行程';
+  document.getElementById('apptChip').textContent = apptDays != null ? `🏥 ${apptDays} 天後回診` : '🏥 未設回診日';
+  document.getElementById('statTrayDays').textContent = trayDays != null ? trayDays : '—';
+  document.getElementById('statTrayDate').textContent = nextTray ? nextTray.ds : '';
+  document.getElementById('statApptDays').textContent = apptDays != null ? apptDays : '—';
+  document.getElementById('statApptDate').textContent = nextAppt ? nextAppt.ds : '';
+}
+
+async function submitRecord() {
+  const btn = document.getElementById('submitBtn');
+  const msg = document.getElementById('statusMsg');
+  msg.className = 'status-msg';
+
+  if (!CONFIG.SCRIPT_URL || CONFIG.SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
+    msg.className = 'status-msg error';
+    msg.textContent = '⚠️ 請先在「設定」頁填入 Apps Script 網址！';
+    return;
+  }
+
+  btn.disabled = true; btn.textContent = '⏳ 儲存中…';
+
+  const dateStr = document.getElementById('recordDate').value || toDateStr(new Date());
+
+  const breathData = {
+    done: breathDone,
+    types: breathTypes,
+    note: document.getElementById('breathNote').value || ''
+  };
+
+  const data = {
+    action: 'log',
+    token: CONFIG.TOKEN || '',
+    date: dateStr,
+    hours,
+    tray_expected: expectedTray || '',
+    tray_actual: actualTray || '',
+    note: document.getElementById('noteInput').value || '',
+    sessions: JSON.stringify(careData),
+    nasal: nasalDone ? 1 : 0,
+    breath: JSON.stringify(breathData)
+  };
+
+  try {
+    const resp = await fetch(CONFIG.SCRIPT_URL, { method:'POST', body: JSON.stringify(data) });
+    const result = await resp.json();
+    if (result.status === 'ok') {
+      msg.className = 'status-msg success';
+      msg.textContent = '✅ 記錄已儲存到 Google Sheets！';
+    } else throw new Error(result.message || '未知錯誤');
+  } catch(e) {
+    msg.className = 'status-msg error';
+    msg.textContent = '❌ 儲存失敗：' + e.message;
+  }
+  btn.disabled = false; btn.textContent = '💾 儲存今日記錄';
+}
+
+function parseSheetDate(cell) {
+  if (!cell) return '';
+  const v = cell.v || '';
+  if (typeof v === 'string' && v.startsWith('Date(')) {
+    const parts = v.replace('Date(','').replace(')','').split(',');
+    const y = parts[0], m = String(parseInt(parts[1])+1).padStart(2,'0'), d = String(parts[2]).padStart(2,'0');
+    return `${y}-${m}-${d}`;
+  }
+  return String(v);
+}
+
+async function loadStats() {
+  const container = document.getElementById('logContainer');
+  container.innerHTML = '<div class="loading">載入中…</div>';
+  try {
+    const resp = await fetch(`${CONFIG.SCRIPT_URL}?token=${encodeURIComponent(CONFIG.TOKEN||'')}`);
+    const result = await resp.json();
+    const rows = (result.rows || []).map(r => ({
+      date: r.date,
+      hours: parseFloat(r.hours) || 0,
+      tray_expected: r.tray_expected,
+      tray_actual: r.tray_actual,
+      sessions: r.sessions,
+      note: r.note,
+      nasal: r.nasal,
+      breath: r.breath
+    })).filter(r => r.date).reverse();
+
+    const fromVal = document.getElementById('statFrom')?.value || '';
+    const toVal = document.getElementById('statTo')?.value || '';
+    const filtered = rows.filter(r => {
+      if (fromVal && r.date < fromVal) return false;
+      if (toVal && r.date > toVal) return false;
+      return true;
+    });
+
+    document.getElementById('avgHours').textContent = filtered.length ? (filtered.reduce((s,r)=>s+r.hours,0)/filtered.length).toFixed(1) : '—';
+    const rangeLabel = `區間（${filtered.length} 天）`;
+    document.getElementById('avgHoursLabel').textContent = `平均時數・${rangeLabel}`;
+    document.getElementById('brushRateLabel').textContent = `早晚刷牙・${rangeLabel}`;
+    document.getElementById('nasalRateLabel').textContent = `洗鼻子・${rangeLabel}`;
+    document.getElementById('breathRateLabel').textContent = `呼吸訓練・${rangeLabel}`;
+    document.getElementById('totalDays') && (document.getElementById('totalDays').textContent = rows.length);
+
+    let brushCount=0, nasalCount=0, breathCount=0;
+    filtered.forEach(r => {
+      try { const s = JSON.parse(r.sessions); if (Object.values(s).some(v => v.brush)) brushCount++; } catch(e) {}
+      if (r.nasal === true || r.nasal === 1 || r.nasal === '1' || r.nasal === 'TRUE') nasalCount++;
+      try { const bd = JSON.parse(r.breath); if (bd.done) breathCount++; } catch(e) {}
+    });
+
+    document.getElementById('brushRate').textContent = filtered.length ? Math.round(brushCount/filtered.length*100)+'%' : '—';
+    document.getElementById('nasalRate').textContent = filtered.length ? Math.round(nasalCount/filtered.length*100)+'%' : '—';
+    document.getElementById('breathRate').textContent = filtered.length ? Math.round(breathCount/filtered.length*100)+'%' : '—';
+
+    let html = `<div class="log-header"><div>日期</div><div>副</div><div style="text-align:center">時數</div><div>🪥</div><div>🌊</div><div>🫁</div></div>`;
+    filtered.forEach(r => {
+      let hasBrush='⬜', hasNasal='⬜', hasBreath='⬜';
+      try { const s = JSON.parse(r.sessions); hasBrush = Object.values(s).some(v=>v.brush)?'✅':'⬜'; } catch(e){}
+      if (r.nasal === true || r.nasal === 1 || r.nasal === '1' || r.nasal === 'TRUE') hasNasal = '✅';
+      try { const bd = JSON.parse(r.breath); if(bd.done) hasBreath='✅'; } catch(e){}
+      html += `<div class="log-row">
+        <div class="log-date">${r.date.substring(5)}</div>
+        <div class="log-tray">第${r.tray_actual||r.tray_expected}副</div>
+        <div class="log-hours">${r.hours}h</div>
+        <div class="log-check">${hasBrush}</div>
+        <div class="log-check">${hasNasal}</div>
+        <div class="log-check">${hasBreath}</div>
+      </div>`;
+    });
+    container.innerHTML = html;
+  } catch(e) {
+    container.innerHTML = `<div class="loading">❌ 載入失敗<br><small>${e.message}</small></div>`;
+  }
+}
+
+function renderTraySchedule() {
+  const list = document.getElementById('trayScheduleList');
+  list.innerHTML = '';
+  (CONFIG.TRAY_SCHEDULE || []).forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'date-item';
+    div.innerHTML = `<span style="font-size:13px;font-weight:700;color:var(--text-soft);min-width:36px;">第${item.tray}副</span>
+      <input class="field-input" type="date" value="${item.start}" onchange="CONFIG.TRAY_SCHEDULE[${i}].start=this.value">
+      <button class="remove-btn" onclick="removeTrayRow(${i})">×</button>`;
+    list.appendChild(div);
+  });
+}
+function addTrayRow() {
+  if (!CONFIG.TRAY_SCHEDULE) CONFIG.TRAY_SCHEDULE = [];
+  const lastTray = CONFIG.TRAY_SCHEDULE.length > 0 ? CONFIG.TRAY_SCHEDULE[CONFIG.TRAY_SCHEDULE.length-1].tray : 0;
+  const lastDate = CONFIG.TRAY_SCHEDULE.length > 0 ? new Date(CONFIG.TRAY_SCHEDULE[CONFIG.TRAY_SCHEDULE.length-1].start) : new Date();
+  lastDate.setDate(lastDate.getDate() + 7);
+  const ds = lastDate.toISOString().substring(0,10);
+  CONFIG.TRAY_SCHEDULE.push({tray: lastTray+1, start: ds});
+  renderTraySchedule();
+}
+function removeTrayRow(i) { CONFIG.TRAY_SCHEDULE.splice(i,1); renderTraySchedule(); }
+
+function renderApptDates() {
+  const list = document.getElementById('apptDateList');
+  list.innerHTML = '';
+  (CONFIG.APPT_DATES || []).forEach((ds, i) => {
+    const div = document.createElement('div');
+    div.className = 'date-item';
+    div.innerHTML = `<input class="field-input" type="date" value="${ds}" onchange="CONFIG.APPT_DATES[${i}]=this.value">
+      <button class="remove-btn" onclick="removeApptRow(${i})">×</button>`;
+    list.appendChild(div);
+  });
+}
+function addApptRow() { if (!CONFIG.APPT_DATES) CONFIG.APPT_DATES = []; CONFIG.APPT_DATES.push(''); renderApptDates(); }
+function removeApptRow(i) { CONFIG.APPT_DATES.splice(i,1); renderApptDates(); }
+
+async function saveSettings() {
+  const btn = document.getElementById('saveBtn');
+  const msg = document.getElementById('settingsMsg');
+  msg.className = 'status-msg';
+
+  CONFIG.TARGET_HOURS = parseInt(document.getElementById('set-target').value) || 22;
+  const scriptUrl = document.getElementById('set-script').value.trim();
+  if (scriptUrl) CONFIG.SCRIPT_URL = scriptUrl;
+  const tokenVal = document.getElementById('set-token').value.trim();
+  if (tokenVal) CONFIG.TOKEN = tokenVal;
+
+  localStorage.setItem('braces_cfg', JSON.stringify({ SCRIPT_URL: CONFIG.SCRIPT_URL, TOKEN: CONFIG.TOKEN }));
+
+  if (!CONFIG.SCRIPT_URL || CONFIG.SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
+    msg.className = 'status-msg error';
+    msg.textContent = '⚠️ 請先填入 Apps Script 網址！';
+    return;
+  }
+
+  btn.disabled = true; btn.textContent = '⏳ 同步中…';
+
+  const data = {
+    action: 'saveSettings',
+    token: CONFIG.TOKEN || '',
+    TARGET_HOURS: CONFIG.TARGET_HOURS,
+    TRAY_SCHEDULE: JSON.stringify(CONFIG.TRAY_SCHEDULE || []),
+    APPT_DATES: JSON.stringify(CONFIG.APPT_DATES || [])
+  };
+
+  try {
+    const resp = await fetch(CONFIG.SCRIPT_URL, { method:'POST', body: JSON.stringify(data) });
+    const result = await resp.json();
+    if (result.status === 'ok') {
+      msg.className = 'status-msg success';
+      msg.textContent = '✅ 設定已同步！';
+    } else throw new Error(result.message || '未知錯誤');
+  } catch(e) {
+    msg.className = 'status-msg error';
+    msg.textContent = '❌ 同步失敗：' + e.message;
+  }
+
+  btn.disabled = false; btn.textContent = '☁️ 儲存並同步設定';
+  refreshUIFromConfig();
+  renderTraySchedule();
+  renderApptDates();
+}
+
+function generateAllIcal(type) {
+  const isTray = type === 'tray';
+  const items = isTray
+    ? (CONFIG.TRAY_SCHEDULE || []).filter(x => x.start)
+    : (CONFIG.APPT_DATES || []).filter(Boolean).map(ds => ({start: ds}));
+
+  if (items.length === 0) { alert('請先填入日期！'); return; }
+
+  let events = items.map(item => {
+    const d = item.start.replace(/-/g,'');
+    const title = isTray ? `🦷 換牙套 第${item.tray}副` : `🏥 牙套回診`;
+    const desc = isTray ? `今天換第${item.tray}副牙套，記得刷牙再換！` : `牙套回診，記得帶牙套。`;
+    return ['BEGIN:VEVENT',`DTSTART;VALUE=DATE:${d}`,`DTEND;VALUE=DATE:${d}`,`SUMMARY:${title}`,`DESCRIPTION:${desc}`,'BEGIN:VALARM','TRIGGER:-PT720M','ACTION:DISPLAY',`DESCRIPTION:${title}`,'END:VALARM','END:VEVENT'].join('\r\n');
+  }).join('\r\n');
+
+  const ical = `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BracesTracker//TW\r\n${events}\r\nEND:VCALENDAR`;
+  const blob = new Blob([ical], {type:'text/calendar'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (isTray ? '換牙套行程' : '回診行程') + '.ics';
+  a.click();
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['record','stats','settings'][i]===tab));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+tab).classList.add('active');
+  if (tab==='stats') loadStats();
+}
+</script>
+</body>
+</html>
