@@ -706,7 +706,7 @@ function setStatRange(days) {
 }
 
 function refreshUIFromConfig() {
-  expectedTray = getExpectedTray();
+  expectedTray = getExpectedTray(dateStr);
   actualTray = expectedTray;
   document.getElementById('trayNum').textContent = actualTray || '—';
   const expText = expectedTray ? `今日應戴：第 ${expectedTray} 副` : '今日應戴：請先在設定填入換片行程';
@@ -837,7 +837,7 @@ async function loadTodayRecord() {
         renumberSnacks(); // 還原完後重新編號
       } catch(e) {}
     }
-
+    refreshUIFromConfig(dateStr);
     msg.textContent = '📂 已載入今日記錄，可繼續修改後重新儲存。';
   } catch(e) {
     msg.className = 'status-msg error';
@@ -883,13 +883,14 @@ function resetRecord() {
   resetBreath();
 }
 
-function getExpectedTray() {
+function getExpectedTray(dateStr) {
   if (!CONFIG.TRAY_SCHEDULE || CONFIG.TRAY_SCHEDULE.length === 0) return null;
-  const today = new Date(); today.setHours(0,0,0,0);
+  const target = dateStr ? new Date(dateStr) : new Date();
+  target.setHours(0,0,0,0);
   let result = null;
   CONFIG.TRAY_SCHEDULE.forEach(item => {
     const d = new Date(item.start); d.setHours(0,0,0,0);
-    if (d <= today) result = item.tray;
+    if (d <= target) result = item.tray;
   });
   return result;
 }
