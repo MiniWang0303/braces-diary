@@ -705,7 +705,7 @@ function setStatRange(days) {
   loadStats();
 }
 
-function refreshUIFromConfig() {
+function refreshUIFromConfig(dateStr) {
   expectedTray = getExpectedTray(dateStr);
   actualTray = expectedTray;
   document.getElementById('trayNum').textContent = actualTray || '—';
@@ -863,6 +863,7 @@ function onDateChange() {
     btn.style.background = 'var(--bg)'; btn.style.color = 'var(--text-soft)'; btn.style.border = '1.5px solid var(--border)';
   }
   resetRecord();
+  refreshUIFromConfig(selected);
   loadTodayRecord();
 }
 
