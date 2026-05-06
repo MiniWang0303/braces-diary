@@ -681,16 +681,13 @@ window.onload = async function() {
 };
 
 async function loadSettingsFromSheets() {
-  if (!CONFIG.SHEET_ID) return;
+  if (!CONFIG.SCRIPT_URL || CONFIG.SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') return;
   try {
-    const url = `https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/gviz/tq?tqx=out:json&sheet=settings`;
+    const url = `${CONFIG.SCRIPT_URL}?action=getSettings&token=${encodeURIComponent(CONFIG.TOKEN||'')}`;
     const resp = await fetch(url);
-    const text = await resp.text();
-    const json = JSON.parse(text.substring(47, text.length - 2));
-    const rows = json.table.rows;
-    if (!rows || rows.length === 0) return;
-    const map = {};
-    rows.forEach(r => { if (r.c[0]?.v && r.c[1]?.v) map[r.c[0].v] = r.c[1].v; });
+    const result = await resp.json();
+    if (result.status !== 'ok') return;
+    const map = result.settings;
     if (map.TRAY_SCHEDULE) try { CONFIG.TRAY_SCHEDULE = JSON.parse(map.TRAY_SCHEDULE); } catch(e){}
     if (map.APPT_DATES) try { CONFIG.APPT_DATES = JSON.parse(map.APPT_DATES); } catch(e){}
     if (map.TARGET_HOURS) CONFIG.TARGET_HOURS = parseInt(map.TARGET_HOURS) || 22;
