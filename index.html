@@ -1186,12 +1186,60 @@ async function loadStats() {
 function renderTraySchedule() {
   const list = document.getElementById('trayScheduleList');
   list.innerHTML = '';
-  (CONFIG.TRAY_SCHEDULE || []).forEach((item, i) => {
+
+  const schedule = CONFIG.TRAY_SCHEDULE || [];
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  // 找當前副數的 index
+  let currentIndex = 0;
+  schedule.forEach((item, i) => {
+    const d = new Date(item.start); d.setHours(0,0,0,0);
+    if (d <= today) currentIndex = i;
+  });
+
+  const showFrom = Math.max(0, currentIndex - 1); // 當前副前1副開始顯示
+  const showToggle = showFrom > 0; // 有隱藏的才顯示「顯示全部」按鈕
+
+  // 摺疊區（舊資料）
+  if (showToggle) {
+    const collapsed = document.createElement('div');
+    collapsed.id = 'trayCollapsed';
+    collapsed.style.display = 'none';
+    schedule.slice(0, showFrom).forEach((item, i) => {
+      const div = document.createElement('div');
+      div.className = 'date-item';
+      div.innerHTML = `<span style="font-size:13px;font-weight:700;color:var(--text-soft);min-width:36px;">第${item.tray}副</span>
+        <input class="field-input" type="date" value="${item.start}" onchange="CONFIG.TRAY_SCHEDULE[${i}].start=this.value">
+        <button class="remove-btn" onclick="removeTrayRow(${i});renderTraySchedule()">×</button>`;
+      collapsed.appendChild(div);
+    });
+    list.appendChild(collapsed);
+
+    const toggleBtn = document.createElement('button');
+    toggleBtn.id = 'trayToggleBtn';
+    toggleBtn.className = 'add-date-btn';
+    toggleBtn.style.background = 'var(--bg)';
+    toggleBtn.style.color = 'var(--text-soft)';
+    toggleBtn.style.fontSize = '12px';
+    toggleBtn.style.marginBottom = '6px';
+    toggleBtn.textContent = `▶ 顯示較舊的 ${showFrom} 副`;
+    toggleBtn.onclick = () => {
+      const c = document.getElementById('trayCollapsed');
+      const isHidden = c.style.display === 'none';
+      c.style.display = isHidden ? 'block' : 'none';
+      toggleBtn.textContent = isHidden ? `▼ 收起較舊的副數` : `▶ 顯示較舊的 ${showFrom} 副`;
+    };
+    list.appendChild(toggleBtn);
+  }
+
+  // 顯示區（當前附近 + 未來）
+  schedule.slice(showFrom).forEach((item, i) => {
+    const realIndex = showFrom + i;
     const div = document.createElement('div');
     div.className = 'date-item';
     div.innerHTML = `<span style="font-size:13px;font-weight:700;color:var(--text-soft);min-width:36px;">第${item.tray}副</span>
-      <input class="field-input" type="date" value="${item.start}" onchange="CONFIG.TRAY_SCHEDULE[${i}].start=this.value">
-      <button class="remove-btn" onclick="removeTrayRow(${i})">×</button>`;
+      <input class="field-input" type="date" value="${item.start}" onchange="CONFIG.TRAY_SCHEDULE[${realIndex}].start=this.value">
+      <button class="remove-btn" onclick="removeTrayRow(${realIndex});renderTraySchedule()">×</button>`;
     list.appendChild(div);
   });
 }
