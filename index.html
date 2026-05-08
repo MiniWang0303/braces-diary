@@ -1194,7 +1194,7 @@ function renderTraySchedule() {
     if (d <= today) currentIndex = i;
   });
 
-  const showFrom = Math.max(0, currentIndex - 1); // 當前副前1副開始顯示
+  const showFrom = currentIndex; // 當前副前1副開始顯示
   const showToggle = showFrom > 0; // 有隱藏的才顯示「顯示全部」按鈕
 
   // 摺疊區（舊資料）
