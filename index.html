@@ -873,6 +873,11 @@ function resetRecord() {
     if (block) block.querySelectorAll('.care-btn').forEach(b => b.classList.remove('checked'));
     updateSessionSummary(s);
   });
+  // 清除點心時段
+  document.querySelectorAll('[data-session^="snack"]').forEach(el => el.remove());
+  Object.keys(careData).forEach(k => { if (k.startsWith('snack')) delete careData[k]; });
+  snackCount = 0;
+	
   actualTray = expectedTray;
   document.getElementById('trayNum').textContent = actualTray || '—';
   updateTrayMatch();
