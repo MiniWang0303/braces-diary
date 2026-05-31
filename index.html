@@ -1334,9 +1334,18 @@ async function saveSettings() {
 
 function generateAllIcal(type) {
   const isTray = type === 'tray';
-  const items = isTray
+  const rawItems = isTray
     ? (CONFIG.TRAY_SCHEDULE || []).filter(x => x.start)
     : (CONFIG.APPT_DATES || []).filter(Boolean).map(ds => ({start: ds}));
+
+  // 去重複：同一個日期只保留一筆
+  const seen = new Set();
+  const items = rawItems.filter(item => {
+    const key = isTray ? `${item.tray}_${item.start}` : item.start;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 
   if (items.length === 0) { alert('請先填入日期！'); return; }
 
