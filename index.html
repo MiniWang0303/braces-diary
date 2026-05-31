@@ -1268,6 +1268,7 @@ function addTrayRow() {
   const ds = lastDate.toISOString().substring(0,10);
   CONFIG.TRAY_SCHEDULE.push({tray: lastTray+1, start: ds});
   renderTraySchedule();
+  saveSettings();
 }
 function removeTrayRow(i) { CONFIG.TRAY_SCHEDULE.splice(i,1); renderTraySchedule(); }
 
