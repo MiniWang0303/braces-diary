@@ -1283,7 +1283,12 @@ function renderApptDates() {
     list.appendChild(div);
   });
 }
-function addApptRow() { if (!CONFIG.APPT_DATES) CONFIG.APPT_DATES = []; CONFIG.APPT_DATES.push(''); renderApptDates(); }
+function addApptRow() {
+  if (!CONFIG.APPT_DATES) CONFIG.APPT_DATES = [];
+  CONFIG.APPT_DATES.push('');
+  renderApptDates();
+  saveSettings();
+}
 function removeApptRow(i) { CONFIG.APPT_DATES.splice(i,1); renderApptDates(); }
 
 async function saveSettings() {
