@@ -715,21 +715,34 @@ function refreshUIFromConfig(dateStr) {
 }
 
 async function loadTodayRecord() {
-	const msg = document.getElementById('statusMsg');
-	msg.className = 'status-msg success';
-	msg.textContent = '⏳ 連線中…';
+  const msg = document.getElementById('statusMsg');
+  msg.className = 'status-msg success';
+  msg.textContent = '⏳ 連線中…';
 
-	const dateStr = document.getElementById('recordDate').value;
-	try {
-	  msg.textContent = `⏳ 讀取 ${dateStr} 的記錄…`;
-	  const url = `${CONFIG.SCRIPT_URL}?date=${dateStr}&token=${encodeURIComponent(CONFIG.TOKEN||'')}`;
-	const resp = await fetch(url);
-	const result = await resp.json();
+  const dateStr = document.getElementById('recordDate').value;
+  try {
+    msg.textContent = `⏳ 讀取 ${dateStr} 的記錄…`;
 
-	let found = null;
-	if (result.status === 'ok' && result.found) {
-	  found = result.data;
-	}
+    // 先檢查 localStorage 快取
+    const cacheKey = `record_${dateStr}`;
+    const cached = localStorage.getItem(cacheKey);
+    let result;
+    if (cached) {
+      result = JSON.parse(cached);
+      msg.textContent = `📂 已載入 ${dateStr} 的記錄（快取）`;
+    } else {
+      const url = `${CONFIG.SCRIPT_URL}?date=${dateStr}&token=${encodeURIComponent(CONFIG.TOKEN||'')}`;
+      const resp = await fetch(url);
+      result = await resp.json();
+      if (result.status === 'ok') {
+        localStorage.setItem(cacheKey, JSON.stringify(result));
+      }
+    }
+
+    let found = null;
+    if (result.status === 'ok' && result.found) {
+      found = result.data;
+    }
 
     if (!found) {
       msg.textContent = `📭 ${dateStr} 尚無記錄`;
@@ -775,7 +788,7 @@ async function loadTodayRecord() {
       } catch(e) {}
     }
 
-	// 還原口腔護理
+    // 還原口腔護理
     if (found.sessions) {
       try {
         const sessions = JSON.parse(found.sessions);
@@ -832,11 +845,11 @@ async function loadTodayRecord() {
           if (snackNoteInput && sData.snackNote) snackNoteInput.value = sData.snackNote;
           updateSessionSummary(sessionId);
         });
-        renumberSnacks(); // 還原完後重新編號
+        renumberSnacks();
       } catch(e) {}
     }
     refreshUIFromConfig(dateStr);
-    msg.textContent = '📂 已載入今日記錄，可繼續修改後重新儲存。';
+    msg.textContent = cached ? '📂 已載入記錄（快取）' : '📂 已載入今日記錄，可繼續修改後重新儲存。';
   } catch(e) {
     msg.className = 'status-msg error';
     msg.textContent = `❌ 讀取失敗：${e.message}`;
@@ -1102,6 +1115,7 @@ async function submitRecord() {
     if (result.status === 'ok') {
       msg.className = 'status-msg success';
       msg.textContent = '✅ 記錄已儲存到 Google Sheets！';
+	  localStorage.removeItem(`record_${dateStr}`); // ← 清快取
     } else throw new Error(result.message || '未知錯誤');
   } catch(e) {
     msg.className = 'status-msg error';
